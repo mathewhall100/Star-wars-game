@@ -9,10 +9,21 @@ $(document).ready(function() {
 
 var $playerSelected = "";
 var $enemySelected = "";
-var enemyOrder = ['first', 'next', 'next', 'next', 'last'];
-var numFought = 0;
-var player = "";
-var enemy = "";
+var player = "none";
+var diffLevel = 1;
+
+
+
+var playerHp = 0;
+var playerAs = 0;
+var numAttacks = 0;
+var enemyHp = 0;
+var enemyCas = 0;
+var enemyNumber = 0;
+var numDefeated = 0;
+
+var attackBtn = true;
+var timesClicked = 0;
 
 var playerArea = $('#plArea');
 var enemyArea = $('#enArea');
@@ -63,55 +74,76 @@ var lord = new Opponent('Dark Lord of Sith', 'assets/images/sith.png', 160, 30, 
 var grevious = new Opponent('General Grevious', 'assets/images/grevious.png', 140, 20, 2);
 
 
-/*Game setup*/
+/*Game setup functions*/
 
-/*Add Players*/
+/*Function: Add Rebel Leaders to game and add event listener to images*/
 
+function rebelLineUp () {
+	playerArea.append("<h3>Pick a Rebel leader as your fighter:</h3>");
+	playerArea.append("<img src='" + luke.image + "' alt='Luke Skywalker' class='plimage' id='pLuke' data-objname='luke'>");
+	playerArea.append("<img src='" + obiWan.image + "' alt='Obi Wan Kenobi' class='plimage' id='pObiWan' data-objname='obiWan'>");
+	playerArea.append("<img src='" + yoda.image + "' alt='Yoda' class='plimage' id='pYoda' data-objname='yoda'>");
+	playerArea.append("<img src='" + leia.image + "' alt='princess Leia' class='plimage' id='pLeia' data-objname='leia'>");
+	playerArea.append("<p id='info1'>&nbsp;</p>");
+	playerArea.append("<p id='info2'>&nbsp;</p>");
 
-playerArea.append("<h3>Pick a Rebel leader as your fighter:</h3>");
-playerArea.append("<img src='" + luke.image + "' alt='Luke Skywalker' class='plimage' id='pLuke' data-objname='luke'>");
-playerArea.append("<img src='" + obiWan.image + "' alt='Obi Wan Kenobi' class='plimage' id='pObiWan' data-objname='obiWan'>");
-playerArea.append("<img src='" + yoda.image + "' alt='Yoda' class='plimage' id='pYoda' data-objname='yoda'>");
-playerArea.append("<img src='" + leia.image + "' alt='princess Leia' class='plimage' id='pLeia' data-objname='leia'>");
-playerArea.append("<p id='info1'>&nbsp;</p>");
-playerArea.append("<p id='info2'>&nbsp;</p>");
-
-
-/*Add Opponents*/
-
-
-enemyArea.append("<h3>Pick the " + enemyOrder[numFought] + " Imperial enemy to fight:</h3>");
-enemyArea.append("<img src='" + vader.image + "' alt='Darth Vader' class='enimage' id='eVader' data-objname='vader'>");
-enemyArea.append("<img src='" + trooper1.image + "' alt='Storm Trooper 1' class='enimage' id='eTrooper1' data-objname='trooper1'>");
-enemyArea.append("<img src='" + trooper2.image + "' alt='Storm Trooper 2' class='enimage' id='eTrooper2' data-objname='trooper2'>");
-enemyArea.append("<img src='" + grevious.image + "' alt='General Grevious' class='enimage' id='eGreviouse' data-objname='grevious'>");
-enemyArea.append("<img src='" + lord.image + "' alt='The Dark Lord' class='enimage' id='eLord' data-objname='lord'>");
-enemyArea.append("<p id='info3'>&nbsp;</p>");
-enemyArea.append("<p id='info4'>&nbsp;</p>");
-
-/*add event listeners to image objects*/
+	$(".plimage").on ("click", rebelClicked);
+}
 
 
-$(".plimage").on ("click", function () {
+/*Add Imperial fighters to game and add event listener to images*/
+/*Called after from rebelClicked fucntion so shows only after a player has been selected*/
 
-	if (player != "selected") {
+function empireLineUp () {
+	enemyArea.append("<h3 id = 'empireheader'>Pick your first Imperial enemy to fight:</h3>");
+	enemyArea.append("<img src='" + vader.image + "' alt='Darth Vader' class='enimage' id='eVader' data-objname='vader'>");
+	enemyArea.append("<img src='" + trooper1.image + "' alt='Storm Trooper 1' class='enimage' id='eTrooper1' data-objname='trooper1'>");
+	enemyArea.append("<img src='" + trooper2.image + "' alt='Storm Trooper 2' class='enimage' id='eTrooper2' data-objname='trooper2'>");
+	enemyArea.append("<img src='" + grevious.image + "' alt='General Grevious' class='enimage' id='eGreviouse' data-objname='grevious'>");
+	enemyArea.append("<img src='" + lord.image + "' alt='The Dark Lord' class='enimage' id='eLord' data-objname='lord'>");
+	enemyArea.append("<p id='info3'>&nbsp;</p>");
+	enemyArea.append("<p id='info4'>&nbsp;</p>");
 
-		$('#' + this.id).fadeOut(2000, function () {$('#' + this.id).remove(); });
+	$(".enimage").on ("click", enemyClicked);
+
+}
+
+/*Adds a rebel character and its information to the Gamespace*/
+/*Calls function to show Imperial images when complete*/
+
+function rebelClicked() {
+
+	if (player == "none") {
+
+		/*Move enemy selected to gamesapce with fade effect*/
+
+		$('#' + this.id).fadeOut(500, function () {$('#' + this.id).remove(); });
 
 		$playerSelected = eval($(this).attr("data-objname"));
+
 		gameSpace.append("<img src='" + $playerSelected.image + "' class='player' id='gplayer'>"); 
 		$('#gplayer').hide();
 		$('#gplayer').fadeIn(2000);
 
-		gameSpace.append("<p id='plinfo'>" + $playerSelected.name + ": </p>");
-		gameSpace.append("<p id='plinfoHp'>Health points: " + $playerSelected.hp + "</p>");
-		gameSpace.append("<p id='plinfoAs'>Attack strength: " + $playerSelected.ap + "</p>");
+		/*Write player parameters to placeholders*/
 
-		player = "selected";
+		$('#plinfo').text($playerSelected.name + ":");
+		$('#plinfoHp').text("Health points: " + $playerSelected.hp);
+		$('#plinfoAs').text("Attack strength: " + $playerSelected.ap);
+
+		
 
 		$('#info1').text("You have selected " + $playerSelected.name + " as your Rebel fighter.");
 
-		$('#info2').text("Now pick an imperial character to fight!!");
+		$('#info2').text("Now pick an enemy to fight!!");
+
+		playerHp = $playerSelected.hp;
+		playerAp = $playerSelected.ap;
+		playerAs = playerAp;
+
+		player = "selected";
+
+		empireLineUp ();
 
 		}
 
@@ -122,40 +154,120 @@ $(".plimage").on ("click", function () {
 				});
 		}
 		
-});
+		
+}
 
+/*Adds an Imperial enemy character and its information to the Gamespace*/
+/*Returns into program flow*/
 
-$(".enimage").on ("click", function () {
+function enemyClicked () {
 
-	if (enemy != "selected") {
+		timesClicked++;
 
-		$('#' + this.id).fadeOut(2000, function () {$('#' + this.id).remove(); });
+	if (timesClicked == 1) {
 
-		$enemySelected = eval($(this).attr("data-objname"));
-		gameSpace.append("<img src='" + $enemySelected.image + "' class='enemy' id='genemy'>"); 
-		$('#genemy').hide();
-		$('#genemy').fadeIn(2000);
+		if (enemyNumber == 0) {
 
-		gameSpace.append("<p id='eninfo'>" + $enemySelected.name + ": </p>");
-		gameSpace.append("<p id='eninfoHp'>Health points: " + $enemySelected.hp + "</p>");
-		gameSpace.append("<p id='eninfoCas'>Attack strength: " + $enemySelected.cap + "</p>");
+			/*Move enemy selected to gamespace with fade effect*/
 
-		enemy = "selected";
+			$('#' + this.id).fadeOut(500, function () {$('#' + this.id).remove(); });
 
-		$('#info3').text("You have selected " + $enemySelected.name + " to fight " + enemyOrder[numFought] + ".");
+			$enemySelected = eval($(this).attr("data-objname"));
+			gameSpace.append("<img src='" + $enemySelected.image + "' class='enemy' id='genemy'>"); 
+			$('#genemy').hide();
+			$('#genemy').fadeIn(2000);
+
+			/*Write enemy parameters in placeholders */
+
+			$('#eninfo').text($enemySelected.name + ": ");
+			$('#eninfoHp').text("Health points: " + $enemySelected.hp);
+			$('#eninfoCas').text("Attack strength: " + $enemySelected.cap);
+			$('#endeftext').text("Enemies defeated: " + numDefeated);
+
+			
+			}
+
+			else {
+
+				$('#gameinfo').empty();
+				$('#attackinfo').empty();
+
+				$('#' + this.id).fadeOut(2000, function () {$('#' + this.id).remove(); });
+
+				$enemySelected = eval($(this).attr("data-objname"));
+				gameSpace.append("<img src='" + $enemySelected.image + "' class='enemy' id='genemy'>"); 
+				$('#genemy').hide();
+				$('#genemy').fadeIn(2000);
+
+				/*Write enemy parameters in placeholders */
+
+				$('#eninfo').text($enemySelected.name + ": ");
+				$('#eninfoHp').text("Health points: " + $enemySelected.hp);
+				$('#eninfoCas').text("Attack strength: " + $enemySelected.cap);
+				$('#endeftext').text("Enemies Defeated: " + numDefeated);
+
+				/* re-enable attack button */
+
+				$('#attack').attr("style", "background-color: yellow");
+				attackBtn = true;
+
+				if (enemyNumber == 5) {
+
+					$('empireheader').text("You are fighting the last Imperial enemy")
+					$('#info3').empty();
+					$('#info4').empty();
+					}
+			}
+
+		$('#info3').text($enemySelected.name + " is selected to fight.");
 
 		$('#info4').text("Let the battle begin!");
 
+		enemyHp = $enemySelected.hp;
+		enemyCas = $enemySelected.cap;
+
+		$('#attack').show(200);		/*Display attack button*/
+
 		}
 
-		else  {
+		else {	
+
+			/*Show timed warning that only one enemy can be selected at once*/
+
 			$('#info3').text("You can only fight one enemy at one time!").delay(2000).queue(function() {
-			$('#info3').text("You have selected " + $enemySelected.name + " to fight " + enemyOrder[numFought] + "."); 
-			$('#info3').dequeue();
+				$('#info3').text($enemySelected.name + " is selected to fight."); 
+				$('#info3').dequeue();
 			});
+
 		}
 
-	var numAttacks = 0;
+
+	
+
+}
+
+function setUpGamespace () {
+
+	/*Create placeholders with Ids for player information*/
+
+	gameSpace.append("<p id='plinfo'>&nbsp;</p>");
+	gameSpace.append("<p id='plinfoHp'>&nbsp;</p>");
+	gameSpace.append("<p id='plinfoAs'>&nbsp;</p>");
+
+	/*Create placeholders with IDs for enemy information*/
+
+	gameSpace.append("<p id='eninfo'>&nbsp;</p>");
+	gameSpace.append("<p id='eninfoHp'>&nbsp;</p>");
+	gameSpace.append("<p id='eninfoCas'>&nbsp;</p>");
+	gameSpace.append("<p id='endeftext'>&nbsp;</p>");
+
+	/*Create placeholders with IDs for attack & counterattack information */
+
+	gameSpace.append("<p id='attackinfo'>&nbsp;</p>");
+	gameSpace.append("<p id='counterinfo'>&nbsp;</p>");
+	gameSpace.append("<p id='gameinfo'>&nbsp;</p>");
+
+	/*Create attack button, add to gamespace and attach event listener*/
 
 	var attackBtn = $('<button>');
 	attackBtn.attr('type', 'button');
@@ -164,29 +276,222 @@ $(".enimage").on ("click", function () {
 	attackBtn.text('Attack');
 
 	gameSpace.append(attackBtn);
-	$('#attack').hide();
-	$('#attack').show(2000);
+	$('#attack').hide();				/*Hide attack button until needed*/
 
-	$("#attack").on('click', function() {
+	$("#attack").on('click', attackFunc);
 
-		numAttacks++;
-		var as = $playerSelected.ap*numAttacks;
+}
+
+
+/* ----------------------------------------------   CALLS  -----------------------------------------------------*/
+
+
+/*Set up the gamespace with elements and attack button hidden but ready to use*/
+
+
+setUpGamespace ();
+
+/*Start game setup by first calling to funvtion to display rebel images from player to select a fighter*/
+
+rebelLineUp ();
+
+
+/*Attack button clicked*/
+
+
+function attackFunc ()	{
+
+		if (attackBtn) {
+
+			numAttacks++;
+
+			playerHp = playerHp-enemyCas;
+			enemyHp = enemyHp-playerAs;
+			if (playerHp < 0) {playerHp = 0;}
+			if (enemyHp < 0) {enemyHp = 0;}
+
 			
-		gameSpace.append("<p id='attackinfo'>You attacked: <br />"
-			+ $enemySelected.name +  " sustained <br />" + as + " points of damage</p>"); 
-
-		gameSpace.append("<p id='counterinfo'>" + $enemySelected.name + "<br />counter-attacked: <br />You sustained <br />"
-			+  $enemySelected.cap + " points of damage</p>");  	
-
-		gameSpace.append("<p id='againinfo'>Attack again to defeat your enemy!</p>");  	 
+			
+			$('#attackinfo').html("You attacked: <br />"
+				+ $enemySelected.name +  " sustained <br />" + playerAs + " points of damage"); 
 
 
+			$('#counterinfo').html($enemySelected.name + "<br />counter-attacked: <br />You sustained <br />"
+				+  enemyCas + " points of damage"); 
 
-		});
+
+			$('#plinfoHp').text("Health points: " + playerHp);
+			$('#plinfoAs').text("Attack strength: " + playerAs);
+
+			$('#eninfoHp').text("Health points: " + enemyHp);
+			$('#plinfoCas').text("Attack strength: " + enemyCas);
+		 
+			console.log(playerHp + "," + enemyHp);
+			if (enemyHp < 1) {attackBtnDisable (); enemyDefeated();}
+
+			if (playerHp < 1) {attackBtnDisable (); playerDefeated();}
+
+			playerAs = (playerAs+playerAp)*diffLevel;
+
+		}
+
+}
+/* Disable the attack button by greying it out and setting its marker to false */
+
+function attackBtnDisable () {
+
+				$('#attack').attr("style", "background-color: grey");
+				attackBtn = false;
+}
 
 
+/*Enemy defeated (enemyHp < 1) */
 
-});
+function enemyDefeated () {
+
+			$('#attackinfo').html("You defeated " + $enemySelected.name + "!<br /><br />" + $enemySelected.name + " RIP!");
+						
+
+			$('#counterinfo').html("");
+			$('#gameinfo').html("You have " + (4-numDefeated) + " more Imperial enemies still alive.<br /><br />" + "<span>Select your next opponent to fight!</span>");
+							
+
+			/* Move defeated enemy to defeated enemies area and resize through animation*/
+			var leftPos = 80+(numDefeated*3.9);
+			$('#genemy').animate({left: leftPos+'%', top: '185px', height: '65px', width: '40px'}, "slow");
+			$('#genemy').attr("id","");   /* remove its id so no longer responds to #genemy */
+
+			numDefeated++;
+		
+			$('#endeftext').text("Enemies Defeated: " + numDefeated);
+
+			if (numDefeated >4) {empireDefeated();}
+
+			else {selectNextEnemy ();}
+
+}
+
+function selectNextEnemy () {
+
+	if (enemyNumber <5) {$('#empireheader').text("Pick the next Imperial enemy to fight:");}
+
+	else {$('#empireheader').text("You have only one more Imperial enemy to fight:");}
+
+	$('#info3').empty();
+	$('#info4').empty();
+
+	enemyNumber++;
+	timesClicked = 0;
+}
+			
+
+			
+
+/*player defeated (playerHp < 1);*/
+
+function playerDefeated () {
+
+		if (enemyHp > 0) {
+
+			$('#attackinfo').html("&nbsp;&nbsp;&nbsp;&nbsp;<span>GAME OVER</span><br /><br />&nbsp;&nbsp;&nbsp;&nbsp;" + $enemySelected.name + " defeated you!");
+
+			}
+
+			else {
+
+			$('#attackinfo').html("&nbsp;&nbsp;&nbsp;&nbsp;<span>GAME OVER</span><br /><br />&nbsp;&nbsp;&nbsp;&nbsp;You and " + $enemySelected.name + " delivered fatal blows to each other!");
+
+			}
+
+
+		$('#counterinfo').empty();
+		$('#gameinfo').empty();
+
+		$('#attack').hide();
+
+		againOrQuit ();
+
+}
+
+/*Empire defeated (playerHp < 1);*/
+
+function empireDefeated () {
+
+		$('#counterinfo').empty();
+
+		$('#attackinfo').html("&nbsp;&nbsp;&nbsp;&nbsp;<span>GAME OVER</span><br /><br />" + 
+							"&nbsp;&nbsp;&nbsp;&nbsp;You defeated: <br /><br />&nbsp;&nbsp;&nbsp;&nbsp;" + 
+							trooper1.name + "<br /><br />&nbsp;&nbsp;&nbsp;&nbsp; - " + 
+							grevious.name + "<br /><br />&nbsp;&nbsp;&nbsp;&nbsp; - " +
+							vader.name + "<br /><br />&nbsp;&nbsp;&nbsp;&nbsp; - " +
+							lord.name + "<br /><br />&nbsp;&nbsp;&nbsp;&nbsp; - ");
+
+		$('empireHeader').html("There are no more Imperial enemies to fight! <br /><br />" + 
+								"The Empire has been defeated and the Rebel Army has won <br /><br />" + 
+								"Good job!");
+
+		againOrQuit ();
+
+}
+
+function againOrQuit () {
+
+		var playBtn = $('<button>');
+			playBtn.attr('type', 'button');
+			playBtn.addClass("playbtn");
+			playBtn.attr('id', 'play');
+			playBtn.text('Play again');
+		gameSpace.append(playBtn);
+
+		var quitBtn = $('<button>');
+			quitBtn.attr('type', 'button');
+			quitBtn.addClass("quitBtn");
+			quitBtn.attr('id', 'quit');
+			quitBtn.text('Quit game');
+		gameSpace.append(quitBtn);
+
+		$("#play").on('click', playAgain);
+		$("#quit").on('click', quitGame);
+
+}
+
+function playAgain () {
+
+	$playerSelected = "";
+	$enemySelected = "";
+	player = "none";
+	diffLevel = 1;
+
+	playerHp = 0;
+	playerAs = 0;
+	numAttacks = 0;
+	enemyHp = 0;
+	enemyCas = 0;
+	enemyNumber = 0;
+	numDefeated = 0;
+
+	attackBtn = true;
+	timesClicked = 0;
+
+	playerArea.empty();
+	enemyArea.empty();
+	gameSpace.empty();
+
+	setUpGamespace ();
+
+	rebelLineUp ();
+
+}
+
+function quitGame () {
+
+}
+
+function swText() {
+
+
+}
+
 
 
 
