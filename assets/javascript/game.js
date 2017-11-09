@@ -81,13 +81,15 @@ var grevious = new Opponent('General Grevious', 'assets/images/grevious.png', 14
 /*Function: Add Rebel Leaders to game and add event listener to images*/
 
 function rebelLineUp () {
-	playerArea.append("<h3>Pick a Rebel leader as your fighter:</h3>");
+	playerArea.append("<h3 id='rebelheader'>Pick a Rebel leader as your fighter:</h3>");
 	playerArea.append("<img src='" + luke.image + "' alt='Luke Skywalker' class='plimage' id='pLuke' data-objname='luke'>");
 	playerArea.append("<img src='" + obiWan.image + "' alt='Obi Wan Kenobi' class='plimage' id='pObiWan' data-objname='obiWan'>");
 	playerArea.append("<img src='" + yoda.image + "' alt='Yoda' class='plimage' id='pYoda' data-objname='yoda'>");
 	playerArea.append("<img src='" + leia.image + "' alt='princess Leia' class='plimage' id='pLeia' data-objname='leia'>");
 	playerArea.append("<p id='info1'>&nbsp;</p>");
 	playerArea.append("<p id='info2'>&nbsp;</p>");
+
+	$('#rebelheader').removeClass('white-text').addClass('yellow-text');
 
 	$(".plimage").on ("click", rebelClicked);
 }
@@ -97,7 +99,7 @@ function rebelLineUp () {
 /*Called after from rebelClicked fucntion so shows only after a player has been selected*/
 
 function empireLineUp () {
-	enemyArea.append("<h3 id = 'empireheader'>Pick your first Imperial enemy to fight:</h3>");
+	enemyArea.append("<h3 id='empireheader'>Pick your first Imperial enemy to fight:</h3>");
 	enemyArea.append("<img src='" + vader.image + "' alt='Darth Vader' class='enimage' id='eVader' data-objname='vader'>");
 	enemyArea.append("<img src='" + trooper1.image + "' alt='Storm Trooper 1' class='enimage' id='eTrooper1' data-objname='trooper1'>");
 	enemyArea.append("<img src='" + trooper2.image + "' alt='Storm Trooper 2' class='enimage' id='eTrooper2' data-objname='trooper2'>");
@@ -105,6 +107,9 @@ function empireLineUp () {
 	enemyArea.append("<img src='" + lord.image + "' alt='The Dark Lord' class='enimage' id='eLord' data-objname='lord'>");
 	enemyArea.append("<p id='info3'>&nbsp;</p>");
 	enemyArea.append("<p id='info4'>&nbsp;</p>");
+
+	$('#empireheader').removeClass('white-text').addClass('yellow-text');
+	$('#rebelheader').removeClass('yellow-text').addClass('white-text');
 
 	$(".enimage").on ("click", enemyClicked);
 
@@ -168,6 +173,8 @@ function rebelClicked() {
 
 function enemyClicked () {
 
+		$('#empireheader').removeClass('yellow-text').addClass('white-text');
+
 		timesClicked++;
 
 	if (timesClicked == 1) {
@@ -207,7 +214,7 @@ function enemyClicked () {
 
 				/*Write enemy parameters in placeholders */
 
-				$('#eninfo').text($enemySelected.name + ": ");
+				$('#eninfo').html('<h3>' + $enemySelected.name + '</h3>');
 				$('#eninfoHp').text("Health points: " + $enemySelected.hp);
 				$('#eninfoCas').text("Attack strength: " + $enemySelected.cap);
 				$('#endeftext').text("Enemies Defeated: " + numDefeated);
@@ -287,27 +294,24 @@ function setUpGamespace () {
 }
 
 function difficultyLev () {
-		var array = ['easy', 'moderate', 'hard', 'probably impossible'];
+		var array = ['easy', 'moderate', 'hard', 'almost impossible'];
 
 		enemyArea.empty();
-
 		enemyArea.append("<h3 id='scores'>--------------------<br />Difficulty level<br />--------------------</h3>");
 		enemyArea.append('<input type="radio" name="levbut" value="4"> Easy<br />');
 		enemyArea.append('<input type="radio" name="levbut" value="3" checked="checked"> Moderate<br />');
 		enemyArea.append('<input type="radio" name="levbut" value="2"> Hard<br />');
-		enemyArea.append('<input type="radio" name="levbut" value="1"> Probably impossible<br />');
+		enemyArea.append('<input type="radio" name="levbut" value="1"> Almost impossible<br />');
 		enemyArea.append('<button id="submit" class="diffbtn">Submit</button>');
 		enemyArea.append('<p id="difftext">&nbsp;</p>');
 		
-		$('#difftext').html('Difficulty Level currently set to <u>' + array[4-diffLevel] + '</u>. Now pick a rebel leader to start the game!');
+		$('#difftext').html('Difficulty Level currently set to <span class="yellow-text">' + array[4-diffLevel] + '</span>. <br /><br />Now pick a rebel leader to start the game!');
 
 
 		$('#submit').click(function() {
 			var radioValue = $('input[name="levbut"]:checked').val();
 			diffLevel = radioValue;
-			console.log(diffLevel);
-
-			$('#difftext').html('Difficulty Level currently set to <u>' + array[4-diffLevel] + '</u>. Now pick a rebel leader to start the game');
+			$('#difftext').html('Difficulty Level currently set to <span class="yellow-text">' + array[4-diffLevel] + '</span>. <br /><br />Now pick a rebel leader to start the game!');
 
 		});
 				
@@ -344,11 +348,11 @@ function attackFunc ()	{
 
 			
 			
-			$('#attackinfo').html("You attacked: <br />"
+			$('#attackinfo').html("<span class='yellow-text'>You attacked! </span><br />"
 				+ $enemySelected.name +  " sustained <br />" + playerAs + " points of damage"); 
 
 
-			$('#counterinfo').html($enemySelected.name + "<br />counter-attacked: <br />You sustained <br />"
+			$('#counterinfo').html("<span class='yellow-text'>" + $enemySelected.name + "<br />counter-attacked: </span><br />You sustained <br />"
 				+  enemyCas + " points of damage"); 
 
 
@@ -365,6 +369,7 @@ function attackFunc ()	{
 			if (playerHp < 1) {attackBtnDisable (); playerDefeated();}
 
 			playerAs = playerAs+(playerAp*diffLevel);
+
 			$('#plinfoAs').text("Attack strength: " + playerAs);
 		}
 
@@ -381,19 +386,16 @@ function attackBtnDisable () {
 
 /*Enemy defeated (enemyHp < 1) */
 
-function enemyDefeated () {
-
-			$('#attackinfo').html("You defeated " + $enemySelected.name + "!<br /><br />" + $enemySelected.name + " RIP!");
-						
-
-			$('#counterinfo').html("");
-			$('#gameinfo').html("There are still " + (4-numDefeated) + " more Imperial enemies still alive.<br /><br />" + "<span>Select your next opponent to fight!</span>");
-							
+function enemyDefeated () {	
 
 			/* Move defeated enemy to defeated enemies area and resize through animation*/
 			var leftPos = 80+(numDefeated*3.9);
 			$('#genemy').animate({left: leftPos+'%', top: '185px', height: '65px', width: '40px'}, "slow");
 			$('#genemy').attr("id","");   /* remove its id so no longer responds to #genemy */
+
+			
+			$('#attackinfo').html("You defeated " + $enemySelected.name + "!<br /><br />" + $enemySelected.name + " RIP!");
+			$('#counterinfo').html("");
 
 			numDefeated++;
 		
@@ -401,15 +403,32 @@ function enemyDefeated () {
 
 			if (numDefeated >4) {empireDefeated();}
 
-			else {selectNextEnemy ();}
+			else {
+				$('#gameinfo').html("").delay(1000).queue(function() {
+				$('#gameinfo').html("But there is no time to rest...<br /><br />" + "<span class='yellow-text'>Select your next opponent above!</span>");
+				$('#gameinfo').dequeue();
+	
+				});
+
+				selectNextEnemy ();
+				}
 
 }
 
 function selectNextEnemy () {
 
-	if (enemyNumber <5) {$('#empireheader').text("Pick the next Imperial enemy to fight:");}
 
-	else {$('#empireheader').text("You have only one more Imperial enemy to fight:");}
+	$('#empireheader').append("").delay(1000).queue(function() {
+				
+		$('#empireheader').removeClass('white-text').addClass('yellow-text');
+
+		if (enemyNumber <5) {$('#empireheader').html("Pick the next Imperial enemy to fight:");}
+
+			else {$('#empireheader').text("You have only one more Imperial enemy to fight:");}
+
+		$('#empireheader').dequeue();
+
+		});
 
 	$('#info3').empty();
 	$('#info4').empty();
@@ -460,12 +479,13 @@ function empireDefeated () {
 		$('#counterinfo').empty();
 		$('#gameinfo').empty();
 
-		$('#attackinfo').html("&nbsp;&nbsp;&nbsp;&nbsp;<span>GAME OVER</span><br /><br />" + 
+		$('#attackinfo').html("&nbsp;&nbsp;&nbsp;&nbsp;<span class='red-text'>GAME OVER</span><br /><br />" + 
 							"&nbsp;&nbsp;&nbsp;&nbsp;You defeated: <br /><br />&nbsp;&nbsp;&nbsp;&nbsp; - two " + 
-							trooper1.name + "s<br /><br />&nbsp;&nbsp;&nbsp;&nbsp; - " + 
-							grevious.name + "<br /><br />&nbsp;&nbsp;&nbsp;&nbsp; - " +
-							vader.name + "<br /><br />&nbsp;&nbsp;&nbsp;&nbsp; - and the " +
-							lord.name + "<br /><br />&nbsp;&nbsp;&nbsp;&nbsp;");
+							trooper1.name + "s<br />&nbsp;&nbsp;&nbsp;&nbsp; - " + 
+							grevious.name + "<br />&nbsp;&nbsp;&nbsp;&nbsp; - " +
+							vader.name + "<br />&nbsp;&nbsp;&nbsp;&nbsp; - and the " +
+							lord.name + "<br /><br />&nbsp;&nbsp;&nbsp;&nbsp;" +
+							"The Rebellion won this battle but the war is not over!.");
 
 
 		$('#attack').hide();
@@ -513,8 +533,6 @@ function playAgain () {
 
 	$playerSelected = "";
 	$enemySelected = "";
-	player = "none";
-	diffLevel = 1;
 
 	playerHp = 0;
 	playerAs = 0;
@@ -523,6 +541,7 @@ function playAgain () {
 	enemyCas = 0;
 	enemyNumber = 0;
 	numDefeated = 0;
+	player = "none";
 
 	attackBtn = true;
 	timesClicked = 0;

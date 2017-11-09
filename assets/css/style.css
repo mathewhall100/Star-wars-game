@@ -63,7 +63,20 @@ p {
 
 * {box-sizing: border-box;}
 
+.yellow-text {
+	color: #feda4a;
+}
 
+.white-text {
+	color: #ddd;
+}
+
+.red-text {
+	color: red;
+	font-weight: bold;
+	font-size: 1.25em;
+	letter-spacing: 10px
+}
 
 /* Gamespace styleing */
 
@@ -123,27 +136,26 @@ hr {
 
 }
 
-.fade {
-  position: relative;
-  width: 100%;
-  min-height: 60vh;
-  top: 25px;
-  z-index: 1;
-}
-
 .star-wars {
   display: flex;
   justify-content: center;
   position: relative;
-  height: 100px; 
+  height: 800px;
+
+  perspective: 400px;
+
   color: #feda4a;
-  font-family: 'Pathway Gothic One', sans-serif;
-  font-size: 500%;
-  font-weight: 600;
+  font-family: 'Century Gothic', CenturyGothic, AppleGothic, sans-serif !important;
+  font-size: 400%;
+  font-weight: 400;
   letter-spacing: 6px;
   line-height: 200%;
-  perspective: 500px;
+  
   text-align: justify;
+}
+
+.center-scroll {
+	text-align: center;
 }
 
 
@@ -152,12 +164,12 @@ hr {
   position: relative;
   top: -100px;
   transform-origin: 50% 100%;
-  animation: crawl 20s linear;
+  animation: crawl 60s linear ;
 }
 
 @keyframes crawl {
   0% {
-    top: -0px;
+    top: 0px;
     transform: rotateX(20deg)  translateZ(0);
   }
   100% { 
@@ -173,7 +185,7 @@ hr {
 	width: 80px;
 	color: #333;
 	font-weight: bold;
-	margin-top: 20px;
+	margin-top: 12px;
 }
 
 .plimage, .enimage{
@@ -239,15 +251,23 @@ hr {
 	color: #333;
 	font-weight: bold;
 	font-size: 32px;
-	background-color: yellow;
+	background-color: gold;
 
 	width: 125px;
 	height: 88px;
+
+	box-shadow: 5px 5px 2px #ddd;
+	border-radius: 4px;
 
 	position:absolute;
 	top: 160px;
 	left: 6%
 }
+
+.attbtn:hover {box-shadow: 5px 5px 5px #ddd;}
+
+.attbtn:active {position: absolute; top: 163px; left: 6.2%;}
+
 
 .playbtn {
 	color: #ddd;
@@ -305,12 +325,6 @@ hr {
 	font-size: 1.25em;
 }
 
-#attackinfo span {
-	color: red;
-	font-weight: bold;
-	font-size: 1.25em;
-	letter-spacing: 10px
-}
 
 .footer {
 	text-align: center;
