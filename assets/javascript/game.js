@@ -10,9 +10,11 @@ $(document).ready(function() {
 var $playerSelected = "";
 var $enemySelected = "";
 var player = "none";
-var diffLevel = 1;
 
-
+var diffLevel = 3;
+var numBattles = 0;
+var rebelScore = 0;
+var empireScore = 0;
 
 var playerHp = 0;
 var playerAs = 0;
@@ -62,10 +64,10 @@ function Opponent(name, image, hp, cap, diffLev) {
 /*Create objects instances for gameplay*/
 
 
-var luke = new Player ('Luke Skywalker', 'assets/images/luke.png', 120, 8);
-var obiWan = new Player ('Obi Wan Kenobi', 'assets/images/obiwan.png', 100, 12);
-var yoda = new Player ('Yoda', 'assets/images/yoda.png', 140,10);
-var leia = new Player ('Princes Leia', 'assets/images/leia.png', 180,6);
+var luke = new Player ('Luke Skywalker', 'assets/images/luke.png', 160, 20);
+var obiWan = new Player ('Obi Wan Kenobi', 'assets/images/obiwan.png', 100, 16);
+var yoda = new Player ('Yoda', 'assets/images/yoda.png', 140,12);
+var leia = new Player ('Princes Leia', 'assets/images/leia.png', 180,8);
 
 var vader = new Opponent('Darth Vader', 'assets/images/vader.png', 120, 25, 2);
 var trooper1 = new Opponent('Storm Trooper', 'assets/images/trooper.png', 60, 10, 1);
@@ -113,6 +115,10 @@ function empireLineUp () {
 
 function rebelClicked() {
 
+	gameSpace.empty();
+	setUpGamespace ();
+	enemyArea.empty();
+
 	if (player == "none") {
 
 		/*Move enemy selected to gamesapce with fade effect*/
@@ -127,7 +133,7 @@ function rebelClicked() {
 
 		/*Write player parameters to placeholders*/
 
-		$('#plinfo').text($playerSelected.name + ":");
+		$('#plinfo').html('<h3>' + $playerSelected.name + '</h3>');
 		$('#plinfoHp').text("Health points: " + $playerSelected.hp);
 		$('#plinfoAs').text("Attack strength: " + $playerSelected.ap);
 
@@ -179,7 +185,7 @@ function enemyClicked () {
 
 			/*Write enemy parameters in placeholders */
 
-			$('#eninfo').text($enemySelected.name + ": ");
+			$('#eninfo').html('<h3>' + $enemySelected.name + '</h3>');
 			$('#eninfoHp').text("Health points: " + $enemySelected.hp);
 			$('#eninfoCas').text("Attack strength: " + $enemySelected.cap);
 			$('#endeftext').text("Enemies defeated: " + numDefeated);
@@ -243,7 +249,6 @@ function enemyClicked () {
 
 
 	
-
 }
 
 function setUpGamespace () {
@@ -279,21 +284,48 @@ function setUpGamespace () {
 	$('#attack').hide();				/*Hide attack button until needed*/
 
 	$("#attack").on('click', attackFunc);
-
 }
+
+function difficultyLev () {
+		var array = ['easy', 'moderate', 'hard', 'probably impossible'];
+
+		enemyArea.empty();
+
+		enemyArea.append("<h3 id='scores'>--------------------<br />Difficulty level<br />--------------------</h3>");
+		enemyArea.append('<input type="radio" name="levbut" value="4"> Easy<br />');
+		enemyArea.append('<input type="radio" name="levbut" value="3" checked="checked"> Moderate<br />');
+		enemyArea.append('<input type="radio" name="levbut" value="2"> Hard<br />');
+		enemyArea.append('<input type="radio" name="levbut" value="1"> Probably impossible<br />');
+		enemyArea.append('<button id="submit" class="diffbtn">Submit</button>');
+		enemyArea.append('<p id="difftext">&nbsp;</p>');
+		
+		$('#difftext').html('Difficulty Level currently set to <u>' + array[4-diffLevel] + '</u>. Now pick a rebel leader to start the game!');
+
+
+		$('#submit').click(function() {
+			var radioValue = $('input[name="levbut"]:checked').val();
+			diffLevel = radioValue;
+			console.log(diffLevel);
+
+			$('#difftext').html('Difficulty Level currently set to <u>' + array[4-diffLevel] + '</u>. Now pick a rebel leader to start the game');
+
+		});
+				
+}
+
 
 
 /* ----------------------------------------------   CALLS  -----------------------------------------------------*/
 
 
-/*Set up the gamespace with elements and attack button hidden but ready to use*/
 
-
-setUpGamespace ();
 
 /*Start game setup by first calling to funvtion to display rebel images from player to select a fighter*/
 
+difficultyLev ();
+
 rebelLineUp ();
+
 
 
 /*Attack button clicked*/
@@ -326,16 +358,18 @@ function attackFunc ()	{
 			$('#eninfoHp').text("Health points: " + enemyHp);
 			$('#plinfoCas').text("Attack strength: " + enemyCas);
 		 
-			console.log(playerHp + "," + enemyHp);
+			
+
 			if (enemyHp < 1) {attackBtnDisable (); enemyDefeated();}
 
 			if (playerHp < 1) {attackBtnDisable (); playerDefeated();}
 
-			playerAs = (playerAs+playerAp)*diffLevel;
-
+			playerAs = playerAs+(playerAp*diffLevel);
+			$('#plinfoAs').text("Attack strength: " + playerAs);
 		}
 
 }
+
 /* Disable the attack button by greying it out and setting its marker to false */
 
 function attackBtnDisable () {
@@ -353,7 +387,7 @@ function enemyDefeated () {
 						
 
 			$('#counterinfo').html("");
-			$('#gameinfo').html("You have " + (4-numDefeated) + " more Imperial enemies still alive.<br /><br />" + "<span>Select your next opponent to fight!</span>");
+			$('#gameinfo').html("There are still " + (4-numDefeated) + " more Imperial enemies still alive.<br /><br />" + "<span>Select your next opponent to fight!</span>");
 							
 
 			/* Move defeated enemy to defeated enemies area and resize through animation*/
@@ -409,6 +443,12 @@ function playerDefeated () {
 
 		$('#attack').hide();
 
+		$('#gplayer').css('opacity', '0.3');
+
+		numBattles++;
+		empireScore++;
+		updateScores(numBattles, rebelScore, empireScore);
+
 		againOrQuit ();
 
 }
@@ -418,19 +458,33 @@ function playerDefeated () {
 function empireDefeated () {
 
 		$('#counterinfo').empty();
+		$('#gameinfo').empty();
 
 		$('#attackinfo').html("&nbsp;&nbsp;&nbsp;&nbsp;<span>GAME OVER</span><br /><br />" + 
-							"&nbsp;&nbsp;&nbsp;&nbsp;You defeated: <br /><br />&nbsp;&nbsp;&nbsp;&nbsp;" + 
-							trooper1.name + "<br /><br />&nbsp;&nbsp;&nbsp;&nbsp; - " + 
+							"&nbsp;&nbsp;&nbsp;&nbsp;You defeated: <br /><br />&nbsp;&nbsp;&nbsp;&nbsp; - two " + 
+							trooper1.name + "s<br /><br />&nbsp;&nbsp;&nbsp;&nbsp; - " + 
 							grevious.name + "<br /><br />&nbsp;&nbsp;&nbsp;&nbsp; - " +
-							vader.name + "<br /><br />&nbsp;&nbsp;&nbsp;&nbsp; - " +
-							lord.name + "<br /><br />&nbsp;&nbsp;&nbsp;&nbsp; - ");
+							vader.name + "<br /><br />&nbsp;&nbsp;&nbsp;&nbsp; - and the " +
+							lord.name + "<br /><br />&nbsp;&nbsp;&nbsp;&nbsp;");
 
-		$('empireHeader').html("There are no more Imperial enemies to fight! <br /><br />" + 
-								"The Empire has been defeated and the Rebel Army has won <br /><br />" + 
-								"Good job!");
+
+		$('#attack').hide();
+
+		numBattles++;
+		rebelScore++;
+		updateScores(numBattles, rebelScore, empireScore);
 
 		againOrQuit ();
+
+}
+
+function updateScores (batt, rebel, empire) {
+		enemyArea.empty();
+
+		enemyArea.append("<h3 id='scores'>----------------<br />S C O R E S<br />----------------</h3>");
+		enemyArea.append("<p id='numbatts'>Battles fought: " + batt + "</p>");
+		enemyArea.append("<p id='rebelsc'>Rebels: " + rebel + "</p>");
+		enemyArea.append("<p id='empiresc'>Empire: " + empire + "</p>");
 
 }
 
@@ -441,14 +495,14 @@ function againOrQuit () {
 			playBtn.addClass("playbtn");
 			playBtn.attr('id', 'play');
 			playBtn.text('Play again');
-		gameSpace.append(playBtn);
+		enemyArea.append(playBtn);
 
 		var quitBtn = $('<button>');
 			quitBtn.attr('type', 'button');
 			quitBtn.addClass("quitBtn");
 			quitBtn.attr('id', 'quit');
 			quitBtn.text('Quit game');
-		gameSpace.append(quitBtn);
+		enemyArea.append(quitBtn);
 
 		$("#play").on('click', playAgain);
 		$("#quit").on('click', quitGame);
@@ -478,7 +532,7 @@ function playAgain () {
 	gameSpace.empty();
 
 	setUpGamespace ();
-
+	difficultyLev (); 
 	rebelLineUp ();
 
 }
@@ -486,13 +540,6 @@ function playAgain () {
 function quitGame () {
 
 }
-
-function swText() {
-
-
-}
-
-
 
 
 
