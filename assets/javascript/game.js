@@ -41,39 +41,46 @@ function Character (name, image, hp) {
 	this.name = name;
 	this.image = image;
 	this.hp = hp;
-
-	this.fadeIn = function () {};
-	this.intoPlay = function () {};
 }
+
+// inherit Player object from Character object
 
 function Player (name, image, hp, ap) {
 	Character.call(this, name, image, hp);
 
 	this.ap = ap; 
-	this.attack = function () {};
+	this.attack = function () {
+		enemyHp = enemyHp-playerAs;
+	};
 }
 
-function Opponent(name, image, hp, cap, diffLev) {
+// inherit Enemy object from Character object
+
+function Enemy(name, image, hp, cap, diffLev) {
 	Character.call(this, name, image, hp);
 
 	this.cap = cap;
 	this.diffLev = diffLev;
-	this.counterAttack = function () {};
+	this.counterAttack = function () {
+		playerHp = playerHp-enemyCas;
+	};
 }
 
-/*Create objects instances for gameplay*/
+/*Create object instances of each character
+  Use array of objetcs to allow easy referencing when 'this' cannot be used (e.g. in event listeners)*/
 
+var rebels = [];
+rebels[0] = new Player('Luke Skywalker', 'assets/images/luke.png', 160, 20);
+rebels[1] = new Player('Obi Wan Kenobi', 'assets/images/obiwan.png', 100, 16);
+rebels[2] = new Player('Yoda', 'assets/images/yoda.png', 140,12);
+rebels[3] = new Player('Princes Leia', 'assets/images/leia.png', 180,8);
 
-var luke = new Player ('Luke Skywalker', 'assets/images/luke.png', 160, 20);
-var obiWan = new Player ('Obi Wan Kenobi', 'assets/images/obiwan.png', 100, 16);
-var yoda = new Player ('Yoda', 'assets/images/yoda.png', 140,12);
-var leia = new Player ('Princes Leia', 'assets/images/leia.png', 180,8);
-
-var vader = new Opponent('Darth Vader', 'assets/images/vader.png', 120, 25, 2);
-var trooper1 = new Opponent('Storm Trooper', 'assets/images/trooper.png', 60, 10, 1);
-var trooper2 = new Opponent('Storm Trooper', 'assets/images/trooper.png', 60, 10, 1);
-var lord = new Opponent('Dark Lord of Sith', 'assets/images/sith.png', 160, 30, 3);
-var grevious = new Opponent('General Grevious', 'assets/images/grevious.png', 140, 20, 2);
+var empires = [];
+empires[0] = new Enemy('Darth Vader', 'assets/images/vader.png', 120, 25, 2);
+empires[1] = new Enemy('Storm Trooper', 'assets/images/trooper.png', 60, 10, 1);
+empires[2] = new Enemy('Storm Trooper', 'assets/images/trooper.png', 60, 10, 1);
+empires[3] = new Enemy('Dark Lord of Sith', 'assets/images/sith.png', 160, 30, 3);
+empires[4] = new Enemy('General Grevious', 'assets/images/grevious.png', 140, 20, 2);
 
 
 /*Game setup functions*/
@@ -81,15 +88,19 @@ var grevious = new Opponent('General Grevious', 'assets/images/grevious.png', 14
 /*Function: Add Rebel Leaders to game and add event listener to images*/
 
 function rebelLineUp () {
-	playerArea.append("<h3 id='rebelheader'>Pick a Rebel leader as your fighter:</h3>");
-	playerArea.append("<img src='" + luke.image + "' alt='Luke Skywalker' class='plimage' id='pLuke' data-objname='luke'>");
-	playerArea.append("<img src='" + obiWan.image + "' alt='Obi Wan Kenobi' class='plimage' id='pObiWan' data-objname='obiWan'>");
-	playerArea.append("<img src='" + yoda.image + "' alt='Yoda' class='plimage' id='pYoda' data-objname='yoda'>");
-	playerArea.append("<img src='" + leia.image + "' alt='princess Leia' class='plimage' id='pLeia' data-objname='leia'>");
+
+	playerArea.append("<h3 id='rebelheader'>Pick a Rebel commander as your fighter:</h3>");
+
+	for (var i=0; i < rebels.length; i++) {
+		playerArea.append("<img src='" + rebels[i].image + "' alt='Image of " + rebels[i].name + "' class='plimage' id='rebimg" + i + "' value='" + i + "' >");
+	}
+
 	playerArea.append("<p id='info1'>&nbsp;</p>");
 	playerArea.append("<p id='info2'>&nbsp;</p>");
 
 	$('#rebelheader').removeClass('white-text').addClass('yellow-text');
+
+	/* Event listener for each clickable image */
 
 	$(".plimage").on ("click", rebelClicked);
 }
@@ -99,20 +110,22 @@ function rebelLineUp () {
 /*Called after from rebelClicked fucntion so shows only after a player has been selected*/
 
 function empireLineUp () {
+
 	enemyArea.append("<h3 id='empireheader'>Pick your first Imperial enemy to fight:</h3>");
-	enemyArea.append("<img src='" + vader.image + "' alt='Darth Vader' class='enimage' id='eVader' data-objname='vader'>");
-	enemyArea.append("<img src='" + trooper1.image + "' alt='Storm Trooper 1' class='enimage' id='eTrooper1' data-objname='trooper1'>");
-	enemyArea.append("<img src='" + trooper2.image + "' alt='Storm Trooper 2' class='enimage' id='eTrooper2' data-objname='trooper2'>");
-	enemyArea.append("<img src='" + grevious.image + "' alt='General Grevious' class='enimage' id='eGreviouse' data-objname='grevious'>");
-	enemyArea.append("<img src='" + lord.image + "' alt='The Dark Lord' class='enimage' id='eLord' data-objname='lord'>");
+
+	for (var i=0; i < empires.length; i++) {
+		enemyArea.append("<img src='" + empires[i].image + "' alt='Image of " + empires[i].name + "' class='enimage' id='empimg" + i + "' value='" + i + "' >");
+	}
+
 	enemyArea.append("<p id='info3'>&nbsp;</p>");
 	enemyArea.append("<p id='info4'>&nbsp;</p>");
 
 	$('#empireheader').removeClass('white-text').addClass('yellow-text');
 	$('#rebelheader').removeClass('yellow-text').addClass('white-text');
 
-	$(".enimage").on ("click", enemyClicked);
+	/* Event listener for each clickable image */
 
+	$(".enimage").on ("click", enemyClicked);
 }
 
 /*Adds a rebel character and its information to the Gamespace*/
@@ -120,18 +133,18 @@ function empireLineUp () {
 
 function rebelClicked() {
 
-	gameSpace.empty();
-	setUpGamespace ();
-	enemyArea.empty();
-
 	if (player == "none") {
+
+		gameSpace.empty();
+		setUpGamespace ();
+
+		enemyArea.empty();
 
 		/*Move enemy selected to gamesapce with fade effect*/
 
 		$('#' + this.id).fadeOut(500, function () {$('#' + this.id).remove(); });
 
-		$playerSelected = eval($(this).attr("data-objname"));
-
+		$playerSelected = rebels[$(this).attr("value")];					//select object as player using value attribute of event listner
 		gameSpace.append("<img src='" + $playerSelected.image + "' class='player' id='gplayer'>"); 
 		$('#gplayer').hide();
 		$('#gplayer').fadeIn(2000);
@@ -163,9 +176,7 @@ function rebelClicked() {
 				$('#info1').text("You have selected " + $playerSelected.name + " as your Rebel fighter"); 
 				$('#info1').dequeue();
 				});
-		}
-		
-		
+		}	
 }
 
 /*Adds an Imperial enemy character and its information to the Gamespace*/
@@ -185,7 +196,7 @@ function enemyClicked () {
 
 			$('#' + this.id).fadeOut(500, function () {$('#' + this.id).remove(); });
 
-			$enemySelected = eval($(this).attr("data-objname"));
+			$enemySelected = empires[$(this).attr("value")]; 							
 			gameSpace.append("<img src='" + $enemySelected.image + "' class='enemy' id='genemy'>"); 
 			$('#genemy').hide();
 			$('#genemy').fadeIn(2000);
@@ -207,7 +218,7 @@ function enemyClicked () {
 
 				$('#' + this.id).fadeOut(2000, function () {$('#' + this.id).remove(); });
 
-				$enemySelected = eval($(this).attr("data-objname"));
+				$enemySelected = empires[$(this).attr("value")];
 				gameSpace.append("<img src='" + $enemySelected.image + "' class='enemy' id='genemy'>"); 
 				$('#genemy').hide();
 				$('#genemy').fadeIn(2000);
@@ -251,12 +262,11 @@ function enemyClicked () {
 				$('#info3').text($enemySelected.name + " is selected to fight."); 
 				$('#info3').dequeue();
 			});
-
 		}
-
-
-	
 }
+
+
+/*Set up the main gamespace with placeholders for player and enemy information*/
 
 function setUpGamespace () {
 
@@ -293,7 +303,10 @@ function setUpGamespace () {
 	$("#attack").on('click', attackFunc);
 }
 
+/*Information and contrls to change difficulty level*/
+
 function difficultyLev () {
+
 		var array = ['easy', 'moderate', 'hard', 'almost impossible'];
 
 		enemyArea.empty();
@@ -307,33 +320,15 @@ function difficultyLev () {
 		
 		$('#difftext').html('Difficulty Level currently set to <span class="yellow-text">' + array[4-diffLevel] + '</span>. <br /><br />Now pick a rebel leader to start the game!');
 
-
 		$('#submit').click(function() {
 			var radioValue = $('input[name="levbut"]:checked').val();
 			diffLevel = radioValue;
 			$('#difftext').html('Difficulty Level currently set to <span class="yellow-text">' + array[4-diffLevel] + '</span>. <br /><br />Now pick a rebel leader to start the game!');
 
-		});
-				
+		});				
 }
 
-
-
-/* ----------------------------------------------   CALLS  -----------------------------------------------------*/
-
-
-
-
-/*Start game setup by first calling to funvtion to display rebel images from player to select a fighter*/
-
-difficultyLev ();
-
-rebelLineUp ();
-
-
-
 /*Attack button clicked*/
-
 
 function attackFunc ()	{
 
@@ -341,8 +336,9 @@ function attackFunc ()	{
 
 			numAttacks++;
 
-			playerHp = playerHp-enemyCas;
-			enemyHp = enemyHp-playerAs;
+			$enemySelected.counterAttack();  		//object method
+			$playerSelected.attack(); 				//object method
+
 			if (playerHp < 0) {playerHp = 0;}
 			if (enemyHp < 0) {enemyHp = 0;}
 
@@ -372,8 +368,8 @@ function attackFunc ()	{
 
 			$('#plinfoAs').text("Attack strength: " + playerAs);
 		}
-
 }
+
 
 /* Disable the attack button by greying it out and setting its marker to false */
 
@@ -391,7 +387,7 @@ function enemyDefeated () {
 			/* Move defeated enemy to defeated enemies area and resize through animation*/
 			var leftPos = 80+(numDefeated*3.9);
 			$('#genemy').animate({left: leftPos+'%', top: '185px', height: '65px', width: '40px'}, "slow");
-			$('#genemy').attr("id","");   /* remove its id so no longer responds to #genemy */
+			$('#genemy').attr("id","");   	/* remove its id so no longer responds to #genemy */
 
 			
 			$('#attackinfo').html("You defeated " + $enemySelected.name + "!<br /><br />" + $enemySelected.name + " RIP!");
@@ -412,17 +408,18 @@ function enemyDefeated () {
 
 				selectNextEnemy ();
 				}
-
 }
 
-function selectNextEnemy () {
 
+/* Select the next enemy to fight */
+
+function selectNextEnemy () {
 
 	$('#empireheader').append("").delay(1000).queue(function() {
 				
 		$('#empireheader').removeClass('white-text').addClass('yellow-text');
 
-		if (enemyNumber <5) {$('#empireheader').html("Pick the next Imperial enemy to fight:");}
+		if (enemyNumber <4) {$('#empireheader').html("Pick the next Imperial enemy to fight:");}
 
 			else {$('#empireheader').text("You have only one more Imperial enemy to fight:");}
 
@@ -436,8 +433,6 @@ function selectNextEnemy () {
 	enemyNumber++;
 	timesClicked = 0;
 }
-			
-
 			
 
 /*player defeated (playerHp < 1);*/
@@ -456,7 +451,6 @@ function playerDefeated () {
 
 			}
 
-
 		$('#counterinfo').empty();
 		$('#gameinfo').empty();
 
@@ -469,10 +463,10 @@ function playerDefeated () {
 		updateScores(numBattles, rebelScore, empireScore);
 
 		againOrQuit ();
-
 }
 
-/*Empire defeated (playerHp < 1);*/
+
+/*Empire defeated (enemyHp < 1);*/
 
 function empireDefeated () {
 
@@ -481,10 +475,10 @@ function empireDefeated () {
 
 		$('#attackinfo').html("&nbsp;&nbsp;&nbsp;&nbsp;<span class='red-text'>GAME OVER</span><br /><br />" + 
 							"&nbsp;&nbsp;&nbsp;&nbsp;You defeated: <br /><br />&nbsp;&nbsp;&nbsp;&nbsp; - two " + 
-							trooper1.name + "s<br />&nbsp;&nbsp;&nbsp;&nbsp; - " + 
-							grevious.name + "<br />&nbsp;&nbsp;&nbsp;&nbsp; - " +
-							vader.name + "<br />&nbsp;&nbsp;&nbsp;&nbsp; - and the " +
-							lord.name + "<br /><br />&nbsp;&nbsp;&nbsp;&nbsp;" +
+							empires[1].name + "s<br />&nbsp;&nbsp;&nbsp;&nbsp; - " + 
+							empires[4].name + "<br />&nbsp;&nbsp;&nbsp;&nbsp; - " +
+							empires[0].name + "<br />&nbsp;&nbsp;&nbsp;&nbsp; - and the " +
+							empires[3].name + "<br /><br />&nbsp;&nbsp;&nbsp;&nbsp;" +
 							"The Rebellion won this battle but the war is not over!.");
 
 
@@ -495,18 +489,23 @@ function empireDefeated () {
 		updateScores(numBattles, rebelScore, empireScore);
 
 		againOrQuit ();
-
 }
 
+
+/*Update and dispaly number of battles and player/empire scores in enemy Area*/
+
 function updateScores (batt, rebel, empire) {
+
 		enemyArea.empty();
 
 		enemyArea.append("<h3 id='scores'>----------------<br />S C O R E S<br />----------------</h3>");
 		enemyArea.append("<p id='numbatts'>Battles fought: " + batt + "</p>");
 		enemyArea.append("<p id='rebelsc'>Rebels: " + rebel + "</p>");
 		enemyArea.append("<p id='empiresc'>Empire: " + empire + "</p>");
-
 }
+
+
+/*Display play again or Quit buttons and attach event listeners*/
 
 function againOrQuit () {
 
@@ -526,8 +525,10 @@ function againOrQuit () {
 
 		$("#play").on('click', playAgain);
 		$("#quit").on('click', quitGame);
-
 }
+
+
+/*If Play again selected  - reset global variables and call setup functions*/
 
 function playAgain () {
 
@@ -558,8 +559,24 @@ function playAgain () {
 
 function quitGame () {
 
+	// Quit game
+
 }
 
 
+/* ----------------------------------------------   CALLS  -----------------------------------------------------*/
 
-}); /*document ready function return*/
+
+/*Run functions non document load : display difficulty level and then rebel fightersa to select 
+  Note++ star wars scroll text at beginning is in CSS only NOT JS */
+
+
+difficultyLev ();
+
+rebelLineUp ();
+
+
+
+/* ---------------------------------------------- document ready function return-----------------------------------------------------*/
+
+}); 
