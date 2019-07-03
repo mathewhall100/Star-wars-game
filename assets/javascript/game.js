@@ -1,6 +1,6 @@
 
 
-/*Javascript for Star Wars game (Week 4 Homework )*/
+/*Javascript for Star Wars game */
 
 $(document).ready(function() {
 
@@ -18,7 +18,7 @@ var gameSpace = $('#gmSpace');
 
 /*Objects*/
 
-/* Player andf enemy Object Constructors and inheritances*/
+/* Player and enemy Object Constructors and inheritances*/
 
 function Character (name, image, hp) {
 	this.name = name;
@@ -68,7 +68,6 @@ empires[4] = new Enemy('General Grevious', 'assets/images/grevious.png', 140, 20
 
 
 /*Constructor for Game object */
-
 
 var Game = {
 
@@ -590,7 +589,7 @@ var Game = {
 /* ----------------------------------------------   CALLS  -----------------------------------------------------*/
 
 
-/*Run functions non document load : display difficulty level and then rebel fightersa to select 
+/*Run functions non document load : display difficulty level and then rebel fighters to select 
   Note++ star wars scroll text at beginning is in CSS only NOT JS */
 
 
