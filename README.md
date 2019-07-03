@@ -3,7 +3,7 @@
 ## Fight for the rebels in this intergalactic game of strategy
 <br />
 
-[https://mathewhall100.github.io/star-wars-game/](https://mathewhall100.github.io/star-wars-game/)
+[https://mathewhall100.github.io/Star-wars-game/](https://mathewhall100.github.io/star-wars-game/)
 
 
 <img src="img\star_wars_img2.PNG" width="600px">
