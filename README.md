@@ -1,11 +1,12 @@
 # Star Wars Game
 
 ## Fight for the rebels and defeat the evil Empire in this intergalactic game of strategy
+<br />
 
 
- <img src="img\star_wars_img2.PNG" width="800px">
+<img src="img\star_wars_img2.PNG" width="600px">
 
-
+<br /><br />
 The Rebels have been cornered by the Imperial army and the fate of the universe rests on one last epic battle. You are leading the Rebel army in the fight to destroy the evil Empire of Lord Sith once and for all.
 
 ## Instructions
